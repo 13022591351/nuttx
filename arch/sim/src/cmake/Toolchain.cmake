@@ -1,5 +1,5 @@
 # ##############################################################################
-# arch/sim/cmake/Toolchain.cmake
+# arch/sim/src/cmake/Toolchain.cmake
 #
 # Licensed to the Apache Software Foundation (ASF) under one or more contributor
 # license agreements.  See the NOTICE file distributed with this work for
@@ -102,8 +102,6 @@ set(ARCHCFLAGS "-Wstrict-prototypes")
 
 if(NOT CONFIG_LIBCXXTOOLCHAIN)
   set(ARCHCXXFLAGS "${ARCHCXXFLAGS} -nostdinc++")
-else()
-  set(ARCHCXXFLAGS "${ARCHCXXFLAGS} -D_STDLIB_H_")
 endif()
 
 if(NOT CONFIG_CXX_EXCEPTION)
