@@ -21,9 +21,10 @@
 UCLIBCXX_VERSION=0.2.5
 
 # Download and unpack tarball if no git repo found
+# curl -O -L https://git.busybox.net/uClibc++/snapshot/uClibc++-$(UCLIBCXX_VERSION).tar.bz2
 ifeq ($(wildcard uClibc++/.git),)
 uClibc++:
-	curl -O -L https://git.busybox.net/uClibc++/snapshot/uClibc++-$(UCLIBCXX_VERSION).tar.bz2
+	curl -O -L file:///home/wang/Work/nuttxspace/3rd/uClibc++-$(UCLIBCXX_VERSION).tar.bz2
 	$(Q) tar -xf uClibc++-$(UCLIBCXX_VERSION).tar.bz2
 	$(Q) $(DELFILE) uClibc++-$(UCLIBCXX_VERSION).tar.bz2
 	$(Q) mv uClibc++-$(UCLIBCXX_VERSION) uClibc++

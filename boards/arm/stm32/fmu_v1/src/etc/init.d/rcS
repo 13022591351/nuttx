@@ -1,0 +1,8 @@
+leds &
+sleep 2
+
+if [ -e "/mnt/sd0/etc/init.d/rc.user" ]; then
+sh /mnt/sd0/etc/init.d/rc.user
+else
+sh /etc/init.d/rc.user
+fi
