@@ -1,5 +1,5 @@
 /****************************************************************************
- * arch/arm/src/samv7/sam_lowputc.h
+ * boards/arm/rp2040/common/src/rp2040_bmp280.c
  *
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
@@ -18,84 +18,91 @@
  *
  ****************************************************************************/
 
-#ifndef __ARCH_ARM_SRC_SAMV7_SAM_LOWPUTC_H
-#define __ARCH_ARM_SRC_SAMV7_SAM_LOWPUTC_H
-
 /****************************************************************************
  * Included Files
  ****************************************************************************/
 
 #include <nuttx/config.h>
-#include <nuttx/compiler.h>
 
-#include <sys/types.h>
-#include <stdint.h>
-#include <stdbool.h>
+#include <stdio.h>
+#include <debug.h>
 
-#include "arm_internal.h"
-#include "chip.h"
+#include <nuttx/arch.h>
+#include <nuttx/sensors/bmp280.h>
+#include <nuttx/i2c/i2c_master.h>
+
+#include "rp2040_i2c.h"
+#include "rp2040_bmp280.h"
 
 /****************************************************************************
  * Pre-processor Definitions
  ****************************************************************************/
 
 /****************************************************************************
- * Public Types
+ * Private Types
  ****************************************************************************/
 
 /****************************************************************************
- * Inline Functions
+ * Private Function Prototypes
  ****************************************************************************/
 
-#ifndef __ASSEMBLY__
+/****************************************************************************
+ * Private Data
+ ****************************************************************************/
 
 /****************************************************************************
  * Public Data
  ****************************************************************************/
 
-#undef EXTERN
-#if defined(__cplusplus)
-#define EXTERN extern "C"
-extern "C"
+/****************************************************************************
+ * Private Functions
+ ****************************************************************************/
+
+/****************************************************************************
+ * Public Functions
+ ****************************************************************************/
+
+/****************************************************************************
+ * Name: board_bmp280_initialize
+ *
+ * Description:
+ *   Initialize and register the BMP280 Pressure Sensor driver.
+ *
+ * Input Parameters:
+ *   devno - The device number, used to build the device path as /dev/pressN
+ *   busno - The I2C bus number
+ *
+ * Returned Value:
+ *   Zero (OK) on success; a negated errno value on failure.
+ *
+ ****************************************************************************/
+
+int board_bmp280_initialize(int busno)
 {
-#else
-#define EXTERN extern
-#endif
+  struct i2c_master_s *i2c;
+  int ret;
+  const int devno = 0;
 
-/****************************************************************************
- * Public Function Prototypes
- ****************************************************************************/
+  sninfo("Initializing BMP280!\n");
 
-/****************************************************************************
- * Name: sam_lowsetup
- *
- * Description:
- *   Called at the very beginning of _start.
- *   Performs low level initialization including setup of the console UART.
- *   This UART done early so that the serial console is available for
- *   debugging very early in the boot sequence.
- *
- ****************************************************************************/
+  /* Initialize BMP280 */
 
-void sam_lowsetup(void);
+  i2c = rp2040_i2cbus_initialize(busno);
+  if (i2c)
+    {
+      /* Then try to register the barometer sensor in I2C0 */
 
-/****************************************************************************
- * Name: sam_boardinitialize
- *
- * Description:
- *   All SAMV7 architectures must provide the following entry point.  This
- *   entry point is called early in the initialization -- after all memory
- *   has been configured and mapped but before any devices have been
- *   initialized.
- *
- ****************************************************************************/
+      ret = bmp280_register(devno, i2c);
+      if (ret < 0)
+        {
+          snerr("ERROR: Error registering BMP280 in I2C%d\n", busno);
+        }
+    }
+  else
+    {
+      ret = -ENODEV;
+    }
 
-void sam_boardinitialize(void);
-
-#undef EXTERN
-#if defined(__cplusplus)
+  return ret;
 }
-#endif
 
-#endif /* __ASSEMBLY__ */
-#endif /* __ARCH_ARM_SRC_SAMV7_SAM_LOWPUTC_H */
