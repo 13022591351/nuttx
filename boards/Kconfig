@@ -1753,6 +1753,7 @@ config ARCH_BOARD_NUCLEO_H745ZI
 	depends on ARCH_CHIP_STM32H745ZI
 	select ARCH_HAVE_LEDS
 	select ARCH_HAVE_BUTTONS
+	select STM32H7_HAVE_PWR_DIRECT_SMPS_SUPPLY
 	---help---
 		STMicro Nucleo H745ZI board based on the STMicro STM32H745ZI MCU.
 
@@ -2011,6 +2012,13 @@ config ARCH_BOARD_BL808_OX64
 	---help---
 		This options selects support for NuttX on PINE64 Ox64 based
 		on Bouffalo Lab BL808 SoC.
+
+config ARCH_BOARD_SG2000_MILKV_DUOS
+	bool "Milk-V Duo S"
+	depends on ARCH_CHIP_SG2000
+	---help---
+		This options selects support for NuttX on Milk-V Duo S based
+		on SOPHGO SG2000 SoC.
 
 config ARCH_BOARD_S32K118EVB
 	bool "NXP S32K118EVB"
@@ -2594,6 +2602,7 @@ config ARCH_BOARD_STM32H747I_DISCO
 	select ARCH_HAVE_LEDS
 	select ARCH_HAVE_BUTTONS
 	select ARCH_HAVE_IRQBUTTONS
+	select STM32H7_HAVE_PWR_DIRECT_SMPS_SUPPLY
 	---help---
 		STMicro STM32H747I-DISCO development board featuring the STM32H747XIH6
 		MCU. The STM32H747XIH6 is a dual core (480MHz Cortex-M7, 240MHz Cortex-M4)
@@ -3373,6 +3382,7 @@ config ARCH_BOARD
 	default "star64"                    if ARCH_BOARD_JH7110_STAR64
 	default "canmv230"                  if ARCH_BOARD_K230_CANMV
 	default "ox64"                      if ARCH_BOARD_BL808_OX64
+	default "milkv_duos"                if ARCH_BOARD_SG2000_MILKV_DUOS
 	default "sabre-6quad"               if ARCH_BOARD_SABRE_6QUAD
 	default "tc397"                     if ARCH_BOARD_TC397
 	default "qemu-armv7a"               if ARCH_BOARD_QEMU_ARMV7A
@@ -4309,6 +4319,9 @@ source "boards/risc-v/k230/canmv230/Kconfig"
 endif
 if ARCH_BOARD_BL808_OX64
 source "boards/risc-v/bl808/ox64/Kconfig"
+endif
+if ARCH_BOARD_SG2000_MILKV_DUOS
+source "boards/risc-v/sg2000/milkv_duos/Kconfig"
 endif
 if ARCH_BOARD_ESP32C3_DEVKIT
 source "boards/risc-v/esp32c3-legacy/esp32c3-devkit/Kconfig"

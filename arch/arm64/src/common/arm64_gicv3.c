@@ -295,6 +295,13 @@ unsigned int arm64_gic_get_active_irq(void)
 
   intid = read_sysreg(ICC_IAR1_EL1);
 
+  /* The ARM GICv3 specification states in 4.1.1 Physical CPU Interface:
+   * The effects of reading ICC_IAR0_EL1 and ICC_IAR1_EL1
+   * on the state of a returned INTID are not guaranteed
+   * to be visible until after the execution of a DSB.
+   */
+
+  ARM64_DSB();
   return intid;
 }
 
@@ -307,6 +314,13 @@ unsigned int arm64_gic_get_active_fiq(void)
 
   intid = read_sysreg(ICC_IAR0_EL1);
 
+  /* The ARM GICv3 specification states in 4.1.1 Physical CPU Interface:
+   * The effects of reading ICC_IAR0_EL1 and ICC_IAR1_EL1
+   * on the state of a returned INTID are not guaranteed
+   * to be visible until after the execution of a DSB.
+   */
+
+  ARM64_DSB();
   return intid;
 }
 #endif
@@ -329,6 +343,8 @@ void aarm64_gic_eoi_irq(unsigned int intid)
   /* (AP -> Pending) Or (Active -> Inactive) or (AP to AP) nested case */
 
   write_sysreg(intid, ICC_EOIR1_EL1);
+
+  ARM64_ISB();
 }
 
 #ifdef CONFIG_ARM64_DECODEFIQ
@@ -350,6 +366,7 @@ void arm64_gic_eoi_fiq(unsigned int intid)
   /* (AP -> Pending) Or (Active -> Inactive) or (AP to AP) nested case */
 
   write_sysreg(intid, ICC_EOIR0_EL1);
+  ARM64_ISB();
 }
 #endif
 
@@ -506,6 +523,9 @@ static void gicv3_cpuif_init(void)
         (icc_sre | ICC_SRE_ELX_SRE_BIT | ICC_SRE_ELX_DIB_BIT |
          ICC_SRE_ELX_DFB_BIT);
       write_sysreg(icc_sre, ICC_SRE_EL1);
+
+      ARM64_ISB();
+
       icc_sre = read_sysreg(ICC_SRE_EL1);
 
       ASSERT(icc_sre & ICC_SRE_ELX_SRE_BIT);
@@ -520,6 +540,8 @@ static void gicv3_cpuif_init(void)
 #ifdef CONFIG_ARM64_DECODEFIQ
   write_sysreg(1, ICC_IGRPEN0_EL1);
 #endif
+
+  ARM64_ISB();
 }
 
 static void gicv3_dist_init(void)
@@ -852,7 +874,7 @@ static int gic_validate_dist_version(void)
     }
   else
     {
-      sinfo("No GIC version detect\n");
+      serr("No GIC version detect\n");
       return -ENODEV;
     }
 
@@ -871,7 +893,7 @@ static int gic_validate_dist_version(void)
 
   if (typer & GICD_TYPER_MBIS)
     {
-      sinfo("MBIs is present, But No support\n");
+      swarn("MBIs is present, But No support\n");
     }
 
   return 0;
@@ -892,7 +914,7 @@ static int gic_validate_redist_version(void)
   if (reg != GICR_PIDR2_ARCH_GICV3 &&
              reg != GICR_PIDR2_ARCH_GICV4)
     {
-      sinfo("No redistributor present 0x%lx\n", redist_base);
+      serr("No redistributor present 0x%lx\n", redist_base);
       return -ENODEV;
     }
 
@@ -926,7 +948,7 @@ static void arm64_gic_init(void)
   err = gic_validate_redist_version();
   if (err)
     {
-      sinfo("no redistributor detected, giving up ret=%d\n", err);
+      swarn("no redistributor detected, giving up ret=%d\n", err);
       return;
     }
 
@@ -949,7 +971,7 @@ int arm64_gic_initialize(void)
   err = gic_validate_dist_version();
   if (err)
     {
-      sinfo("no distributor detected, giving up ret=%d\n", err);
+      swarn("no distributor detected, giving up ret=%d\n", err);
       return err;
     }
 

@@ -1,5 +1,5 @@
 /****************************************************************************
- * mm/iob/iob_get_queue_size.c
+ * boards/risc-v/esp32c3/common/src/esp_board_spidev.c
  *
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
@@ -23,36 +23,59 @@
  ****************************************************************************/
 
 #include <nuttx/config.h>
-#include <nuttx/mm/iob.h>
-#include "iob.h"
 
-#if CONFIG_IOB_NCHAINS > 0
+#include <stdio.h>
+#include <debug.h>
+#include <errno.h>
+
+#include <nuttx/spi/spi_transfer.h>
+
+#include "espressif/esp_spi.h"
+
+#include "esp_board_spidev.h"
 
 /****************************************************************************
  * Public Functions
  ****************************************************************************/
 
 /****************************************************************************
- * Name: iob_get_queue_size
+ * Name: board_spidev_initialize
  *
  * Description:
- *   Queue helper for get the iob queue buffer size.
+ *   Initialize SPI driver and register the /dev/spi device.
+ *
+ * Input Parameters:
+ *   port - The SPI bus number, used to build the device path as /dev/spiN
+ *
+ * Returned Value:
+ *   Zero (OK) is returned on success; A negated errno value is returned
+ *   to indicate the nature of any failure.
  *
  ****************************************************************************/
 
-unsigned int iob_get_queue_size(FAR struct iob_queue_s *queue)
+int board_spidev_initialize(int port)
 {
-  FAR struct iob_qentry_s *iobq;
-  unsigned int total = 0;
-  FAR struct iob_s *iob;
+  int ret;
+  struct spi_dev_s *spi;
 
-  for (iobq = queue->qh_head; iobq != NULL; iobq = iobq->qe_flink)
+  syslog(LOG_INFO, "Initializing /dev/spi%d...\n", port);
+
+  /* Initialize SPI device */
+
+  spi = esp_spibus_initialize(port);
+  if (spi == NULL)
     {
-      iob = iobq->qe_head;
-      total += iob->io_pktlen;
+      syslog(LOG_ERR, "Failed to initialize SPI%d.\n", port);
+      return -ENODEV;
     }
 
-  return total;
-}
+  ret = spi_register(spi, port);
+  if (ret < 0)
+    {
+      syslog(LOG_ERR, "Failed to register /dev/spi%d: %d\n", port, ret);
 
-#endif /* CONFIG_IOB_NCHAINS > 0 */
+      esp_spibus_uninitialize(spi);
+    }
+
+  return ret;
+}
