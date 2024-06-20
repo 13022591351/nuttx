@@ -249,6 +249,32 @@
 #define DMAMAP_USART6_RX  DMAMAP_USART6_RX_1
 #define DMAMAP_USART6_TX  DMAMAP_USART6_TX_1
 
+/* CAN1
+ *
+ * ---------- -------------
+ * PIO        SIGNAL       
+ * ---------- -------------
+ * PB8        CAN1_RX
+ * PB9        CAN1_TX
+ * ---------- -------------
+ */
+
+#define GPIO_CAN1_RX      GPIO_CAN1_RX_2    /* PB8 */
+#define GPIO_CAN1_TX      GPIO_CAN1_TX_2    /* PB9 */
+
+/* CAN2
+ *
+ * ---------- -------------
+ * PIO        SIGNAL       
+ * ---------- -------------
+ * PB5        CAN2_RX
+ * PB6        CAN2_TX
+ * ---------- -------------
+ */
+
+#define GPIO_CAN2_RX      GPIO_CAN2_RX_2    /* PB5 */
+#define GPIO_CAN2_TX      GPIO_CAN2_TX_2    /* PB6 */
+
 /* SPI2 */
 
 #define GPIO_SPI2_MISO    GPIO_SPI2_MISO_1

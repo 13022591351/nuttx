@@ -1,22 +1,22 @@
-exit 0
+sleep 2
 
-echo -c "UNLOG COM1" > dev/ttyS1
-echo -c "RTCM1005 COM1 10" > dev/ttyS1
-echo -c "RTCM1033 COM1 10" > dev/ttyS1
-echo -c "RTCM1125 COM1 1" > dev/ttyS1
-echo -c "RTCM1075 COM1 1" > dev/ttyS1
-echo -c "RTCM1085 COM1 1" > dev/ttyS1
+ifconfig eth0 192.168.0.100
 
-echo -c "UNLOG COM2" > dev/ttyS1
-echo -c "RTCM1005 COM2 10" > dev/ttyS1
-echo -c "RTCM1033 COM2 10" > dev/ttyS1
-echo -c "RTCM1125 COM2 1" > dev/ttyS1
-echo -c "RTCM1075 COM2 1" > dev/ttyS1
-echo -c "RTCM1085 COM2 1" > dev/ttyS1
+echo -c "MODE BASE TIME 10" > dev/ttyS2
 
 unicore &
 
-ntrip_client "192.168.2.146" "5505" "RTCM30_GG" "NTRIP GNSSInternetRadio/1.4.10" "123" "456" &
-
 rtcm3_proxy &
 
+ntrip_client "sdk.pnt.10086.cn" "8002" "RTCM33_GRC" "NTRIP GNSSInternetRadio/1.4.10" "csha20325" "ac848wme" &
+
+exit 0
+
+echo -c "UNLOG COM2" > dev/ttyS2
+echo -c "RTCM1005 COM2 10" > dev/ttyS2
+echo -c "RTCM1033 COM2 10" > dev/ttyS2
+echo -c "RTCM1125 COM2 1" > dev/ttyS2
+echo -c "RTCM1075 COM2 1" > dev/ttyS2
+echo -c "RTCM1085 COM2 1" > dev/ttyS2
+
+exit 0

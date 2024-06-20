@@ -77,7 +77,7 @@ int stm32_bringup(void) {
     ret = stm32_sdio_initialize();
     if (ret != OK) {
         ferr("ERROR: Failed to initialize MMC/SD driver: %d\n", ret);
-        return ret;
+        // return ret;
     }
 
 #endif
@@ -99,7 +99,7 @@ int stm32_bringup(void) {
         ret = nx_mount("/dev/mmcsd0", "/mnt/sd0", "vfat", 0, "forceformat");
         if (ret < 0) {
             ferr("ERROR: Failed to mount the SD card: %d\n", ret);
-            return ret;
+            // return ret;
         }
     }
 
@@ -113,7 +113,6 @@ int stm32_bringup(void) {
     }
 
 #endif
-
 
 #ifdef CONFIG_PWM
 
@@ -129,7 +128,15 @@ int stm32_bringup(void) {
     ret = stm32_capture_setup();
     if (ret < 0) {
         syslog(LOG_ERR, "ERROR: stm32_capture_setup failed: %d\n", ret);
-        return ret;
+    }
+
+#endif
+
+#ifdef CONFIG_STM32_CAN_CHARDRIVER
+
+    ret = stm32_can_setup();
+    if (ret < 0) {
+        syslog(LOG_ERR, "ERROR: stm32_can_setup failed: %d\n", ret);
     }
 
 #endif

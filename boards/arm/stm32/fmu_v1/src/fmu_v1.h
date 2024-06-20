@@ -177,6 +177,18 @@ int stm32_capture_setup(void);
 #endif
 
 /****************************************************************************
+ * Name: stm32_can_setup
+ *
+ * Description:
+ *  Initialize CAN and register the CAN device
+ *
+ ****************************************************************************/
+
+#ifdef CONFIG_STM32_CAN_CHARDRIVER
+int stm32_can_setup(void);
+#endif
+
+/****************************************************************************
  * Name: stm32_dma_alloc_init
  *
  * Description:

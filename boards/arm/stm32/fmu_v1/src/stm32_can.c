@@ -44,16 +44,16 @@
 
 /* Configuration ************************************************************/
 
-#if defined(CONFIG_STM32_CAN1) && defined(CONFIG_STM32_CAN2)
-#  warning "Both CAN1 and CAN2 are enabled.  Assuming only CAN1."
-#  undef CONFIG_STM32_CAN2
-#endif
+// #if defined(CONFIG_STM32_CAN1) && defined(CONFIG_STM32_CAN2)
+// #  warning "Both CAN1 and CAN2 are enabled.  Assuming only CAN1."
+// #  undef CONFIG_STM32_CAN2
+// #endif
 
-#ifdef CONFIG_STM32_CAN1
-#  define CAN_PORT 1
-#else
-#  define CAN_PORT 2
-#endif
+// #ifdef CONFIG_STM32_CAN1
+// #  define CAN_PORT 1
+// #else
+// #  define CAN_PORT 2
+// #endif
 
 /****************************************************************************
  * Public Functions
@@ -67,34 +67,46 @@
  *
  ****************************************************************************/
 
-int stm32_can_setup(void)
-{
-#if defined(CONFIG_STM32_CAN1) || defined(CONFIG_STM32_CAN2)
-  struct can_dev_s *can;
-  int ret;
+int stm32_can_setup(void) {
+  int ret = -ENODEV;
 
-  /* Call stm32_caninitialize() to get an instance of the CAN interface */
+#if defined(CONFIG_STM32_CAN1)
+  struct can_dev_s *can1;
 
-  can = stm32_caninitialize(CAN_PORT);
-  if (can == NULL)
-    {
-      canerr("ERROR:  Failed to get CAN interface\n");
-      return -ENODEV;
-    }
+  can1 = stm32_caninitialize(1);
+  if (can1 == NULL) {
+    canerr("ERROR:  Failed to get CAN interface\n");
+    return -ENODEV;
+  }
 
-  /* Register the CAN driver at "/dev/can0" */
-
-  ret = can_register("/dev/can0", can);
-  if (ret < 0)
-    {
-      canerr("ERROR: can_register failed: %d\n", ret);
-      return ret;
-    }
-
-  return OK;
-#else
-  return -ENODEV;
+  ret = can_register("/dev/can0", can1);
+  if (ret < 0) {
+    canerr("ERROR: can_register failed: %d\n", ret);
+    return ret;
+  }
 #endif
+
+#if defined(CONFIG_STM32_CAN2)
+  struct can_dev_s *can2;
+
+  can2 = stm32_caninitialize(2);
+  if (can2 == NULL) {
+    canerr("ERROR:  Failed to get CAN interface\n");
+    return -ENODEV;
+  }
+
+  ret = can_register("/dev/can1", can2);
+  if (ret < 0) {
+    canerr("ERROR: can_register failed: %d\n", ret);
+    return ret;
+  }
+#endif
+
+  if (ret != -ENODEV) {
+    return OK;
+  }
+
+  return ret;
 }
 
 #endif /* CONFIG_CAN */
