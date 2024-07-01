@@ -1,5 +1,5 @@
 /****************************************************************************
- * arch/arm64/src/common/arm64_systemreset.c
+ * arch/risc-v/src/bl808/hardware/bl808_m0ic.h
  *
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
@@ -18,46 +18,30 @@
  *
  ****************************************************************************/
 
+#ifndef __ARCH_RISCV_SRC_BL808_HARDWARE_BL808_M0IC_H
+#define __ARCH_RISCV_SRC_BL808_HARDWARE_BL808_M0IC_H
+
 /****************************************************************************
  * Included Files
  ****************************************************************************/
 
 #include <nuttx/config.h>
-
-#include <stdint.h>
-#include <debug.h>
-
-#include <nuttx/arch.h>
-#include <nuttx/board.h>
-
-#include "arm64_internal.h"
-#include "arm64_cpu_psci.h"
+#include "hardware/bl808_memorymap.h"
 
 /****************************************************************************
- * Public Functions
+ * Pre-processor Definitions
  ****************************************************************************/
 
-/****************************************************************************
- * Name: up_systemreset
- *
- * Description:
- *   Internal, arm64 reset logic.
- *
- ****************************************************************************/
+/* Register offsets */
 
-void up_systemreset(void)
-{
-  int ret;
+#define BL808_M0IC_STATUS_OFFSET(n)		(0x00 + 4 * (n))
+#define BL808_M0IC_MASK_OFFSET(n)		(0x08 + 4 * (n))
+#define BL808_M0IC_CLEAR_OFFSET(n)		(0x10 + 4 * (n))
 
-  /* Set up for the system reset */
+/* Register locations */
 
-  ret = psci_cpu_reset();
-  if (ret)
-    {
-      sinfo("Failed to reset CPU, error code: %d\n", ret);
-    }
+#define BL808_M0IC_STATUS(n) BL808_M0IC_BASE + BL808_M0IC_STATUS_OFFSET(n)
+#define BL808_M0IC_MASK(n)   BL808_M0IC_BASE + BL808_M0IC_MASK_OFFSET(n)
+#define BL808_M0IC_CLEAR(n)  BL808_M0IC_BASE + BL808_M0IC_CLEAR_OFFSET(n)
 
-  /* Wait for the reset */
-
-  for (; ; );
-}
+#endif /* __ARCH_RISCV_SRC_BL808_HARDWARE_BL808_M0IC_H */

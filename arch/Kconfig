@@ -133,7 +133,9 @@ config ARCH_X86_64
 	select ARCH_HAVE_TCBINFO
 	select ARCH_HAVE_FPU
 	select ARCH_HAVE_DPFPU
+	select ARCH_HAVE_MULTICPU
 	select ARCH_HAVE_TESTSET
+	select ARCH_HAVE_INTERRUPTSTACK
 	select ARCH_HAVE_CUSTOMOPT
 	select LIBC_ARCH_ELF_64BIT if LIBC_ARCH_ELF
 	---help---
@@ -1039,7 +1041,6 @@ config ARCH_STACKDUMP_MAX_LENGTH
 config DUMP_ON_EXIT
 	bool "Dump all tasks state on exit"
 	default n
-	depends on DEBUG_SCHED_INFO
 	---help---
 		Dump all tasks state on exit()
 

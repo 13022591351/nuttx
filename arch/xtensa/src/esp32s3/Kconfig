@@ -9,17 +9,17 @@ comment "ESP32-S3 Configuration Options"
 
 choice
 	prompt "ESP32-S3 Chip Selection"
-	default ARCH_CHIP_ESP32S3WROOM1
+	default ARCH_CHIP_ESP32S3WROOM1N4
 
-config ARCH_CHIP_ESP32S3WROOM1
-	bool "ESP32-S3-WROOM-1"
+config ARCH_CHIP_ESP32S3WROOM1N4
+	bool "ESP32-S3-WROOM-1-N4"
 	select ESP32S3_FLASH_4M
 	select ARCH_HAVE_I2CRESET
 	---help---
-		Generic module with an embedded ESP32-S3.
+		Generic module with an embedded ESP32-S3. This chip comes with 4MB SPI Flash
 
-config ARCH_CHIP_ESP32S3WROOM2
-	bool "ESP32-S3-WROOM-2 with 16MB Flash"
+config ARCH_CHIP_ESP32S3WROOM2N16R8V
+	bool "ESP32-S3-WROOM-2-N16R8V"
 	select ESP32S3_FLASH_16M
 	select ESP32S3_PSRAM_8M
 	select ARCH_HAVE_I2CRESET
@@ -29,8 +29,8 @@ config ARCH_CHIP_ESP32S3WROOM2
 		Note: depending on the modules, WROOM2 has 16MB flash
 		(ESP32-S3-WROOM-2-N16R8V) or 32MB flash. (ESP32-S3-WROOM-2-N32R8V)
 
-config ARCH_CHIP_ESP32S3WROOM2_32M
-	bool "ESP32-S3-WROOM-2 with 32MB Flash"
+config ARCH_CHIP_ESP32S3WROOM2N32R8V
+	bool "ESP32-S3-WROOM-2-N32R8V"
 	select ESP32S3_FLASH_32M
 	select ESP32S3_PSRAM_8M
 	select ARCH_HAVE_I2CRESET
@@ -40,12 +40,20 @@ config ARCH_CHIP_ESP32S3WROOM2_32M
 		Note: depending on the modules, WROOM2 has 16MB flash
 		(ESP32-S3-WROOM-2-N16R8V) or 32MB flash. (ESP32-S3-WROOM-2-N32R8V)
 
-config ARCH_CHIP_ESP32S3MINI1
-	bool "ESP32-S3-MINI-1"
+config ARCH_CHIP_ESP32S3MINI1N8
+	bool "ESP32-S3-MINI-1-N8"
 	select ESP32S3_FLASH_8M
 	select ARCH_HAVE_I2CRESET
 	---help---
-		Generic module with an embedded ESP32-S3.
+		Generic ESP32S3-Mini Module with 8MB of Flash
+
+config ARCH_CHIP_ESP32S3CUSTOM
+	bool "ESP32-S3-Custom-Module"
+	select ARCH_HAVE_I2CRESET
+	---help---
+		Generic module with an embedded ESP32-S3. Chip Flash Size should be selected
+		under SPI FLash Menu. 
+
 
 endchoice # ESP32-S3 Chip Selection
 
@@ -274,7 +282,7 @@ config ESP32S3_FLASH_DETECT
 		Auto detect flash size when flashing.
 
 config ESP32S3_PSRAM_8M
-	bool
+	bool "ESP32S3 PSRAM 8M"
 	default n
 
 config ESP32S3_RUN_IRAM
@@ -1536,6 +1544,10 @@ config ESP32S3_WIFI_RXBA_AMPDU_WZ
 	int "Wi-Fi RX BA AMPDU windown size"
 	default 6
 
+config ESP32S3_WLAN_PKTBUF_NUM
+	int "WLAN netcard packet buffer number per netcard"
+	default 16
+
 config ESP_WIFI_GCMP_SUPPORT
 	bool "WiFi GCMP Support(GCMP128 and GCMP256)"
 	default n
@@ -1880,6 +1892,29 @@ config ESP32S3_SPI_FLASH_USE_32BIT_ADDRESS
 		if select the option, it will force to use source code instead
 		of functions in ROM, so that SPI flash driver can access full
 		32-bit address.
+		
+choice ESP32S3_FLASH_SIZE
+	prompt "ESP32S3 Custom Module Flash Size"
+	depends on ARCH_CHIP_ESP32S3CUSTOM
+	default ESP32S3CUSTOM_FLASH_4M
+
+	config ESP32S3CUSTOM_FLASH_4M
+		bool "ESP32S3 Flash 4MB"
+		select ESP32S3_FLASH_4M
+
+	config ESP32S3CUSTOM_FLASH_8M
+		bool "ESP32S3 Flash 8MB"
+		select ESP32S3_FLASH_8M
+
+	config ESP32S3CUSTOM_FLASH_16M
+		bool "ESP32S3 Flash 16MB"
+		select ESP32S3_FLASH_16M
+
+	config ESP32S3CUSTOM_FLASH_32M
+		bool "ESP32S3 Flash 32MB"
+		select ESP32S3_FLASH_32M
+		select ESP32S3_SPI_FLASH_USE_32BIT_ADDRESS
+endchoice # ESP32S3_FLASH_SIZE
 
 config ESP32S3_HAVE_OTA_PARTITION
 	bool
@@ -2081,6 +2116,71 @@ config ESP32S3_LEDC_CHANNEL7_PIN
 	default 9
 
 endmenu # LEDC configuration
+
+menu "MCPWM Configuration"
+	depends on ESP_MCPWM
+
+config ESP_MCPWM_CAPTURE
+	bool "MCPWM Capture Submodule"
+	depends on ESP_MCPWM
+	select CAPTURE
+	default n
+	---help---
+		Enables the use of the MCPWM capture submodule.
+
+if ESP_MCPWM_CAPTURE
+
+config ESP_MCPWM_CAPTURE_CH0
+	bool "Capture Channel 0"
+	default n
+	---help---
+		Enables capture on channel 0.
+
+if ESP_MCPWM_CAPTURE_CH0
+
+config ESP_MCPWM_CAPTURE_CH0_GPIO
+	int "GPIO Pin"
+	default 12
+	---help---
+		GPIO pin assigned to capture channel 0.
+
+endif # ESP_MCPWM_CAPTURE_CH0
+
+config ESP_MCPWM_CAPTURE_CH1
+	bool "Capture Channel 1"
+	default n
+	---help---
+		Enables capture on channel 1.
+
+if ESP_MCPWM_CAPTURE_CH1
+
+config ESP_MCPWM_CAPTURE_CH1_GPIO
+	int "GPIO Pin"
+	default 15
+	---help---
+		GPIO pin assigned to capture channel 1.
+
+endif # ESP_MCPWM_CAPTURE_CH1
+
+config ESP_MCPWM_CAPTURE_CH2
+	bool "Capture Channel 2"
+	default n
+	---help---
+		Enables capture on channel 2.
+
+if ESP_MCPWM_CAPTURE_CH2
+
+config ESP_MCPWM_CAPTURE_CH2_GPIO
+	int "GPIO Pin"
+	default 16
+	---help---
+		GPIO pin assigned to capture channel 2.
+
+endif # ESP_MCPWM_CAPTURE_CH2
+
+endif # ESP_MCPWM_CAPTURE
+
+endmenu # MCPWM Configuration
 
 menu "USB OTG Configuration"
 	depends on ESP32S3_OTG
@@ -2367,7 +2467,7 @@ config ESP32S3_KERNEL_IMAGE_SIZE
 
 config ESP32S3_KERNEL_RAM_SIZE
 	hex "Kernel Allocated RAM"
-	default 0x29000
+	default 0x30000
 	range 0x10000 0x54700
 	depends on ESP32S3_APP_FORMAT_LEGACY
 	---help---
