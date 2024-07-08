@@ -1,5 +1,5 @@
 /****************************************************************************
- * arch/xtensa/src/esp32s2/loader.h
+ * arch/x86_64/src/intel64/intel64_pgalloc.c
  *
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
@@ -18,63 +18,56 @@
  *
  ****************************************************************************/
 
-#ifndef __ARCH_XTENSA_SRC_ESP32S2_LOADER_H
-#define __ARCH_XTENSA_SRC_ESP32S2_LOADER_H
-
 /****************************************************************************
  * Included Files
  ****************************************************************************/
 
+#include <nuttx/arch.h>
 #include <nuttx/config.h>
-#include <stdint.h>
+
+#include <assert.h>
+#include <debug.h>
 
 /****************************************************************************
  * Pre-processor Definitions
  ****************************************************************************/
 
-/****************************************************************************
- * Public Types
- ****************************************************************************/
+/* Additional checks for CONFIG_ARCH_PGPOOL_MAPPING */
 
-/****************************************************************************
- * Public Data
- ****************************************************************************/
-
-#ifndef __ASSEMBLY__
-#if defined(__cplusplus)
-#define EXTERN extern "C"
-extern "C"
-{
-#else
-#define EXTERN extern
+#ifdef CONFIG_ARCH_PGPOOL_MAPPING
+#  if CONFIG_ARCH_PGPOOL_VBASE != (CONFIG_ARCH_PGPOOL_PBASE + X86_64_LOAD_OFFSET)
+#    error invalid PGPOOL configuration
+#  endif
 #endif
 
 /****************************************************************************
- * Public Functions Prototypes
+ * Public Functions
  ****************************************************************************/
 
 /****************************************************************************
- * Name: map_rom_segments
+ * Name: up_allocate_pgheap
  *
  * Description:
- *   Configure the MMU and Cache peripherals for accessing ROM code and data.
- *
- * Input Parameters:
- *   None.
- *
- * Returned Value:
- *   None.
+ *   If there is a page allocator in the configuration, then this function
+ *   must be provided by the platform-specific code.  The OS initialization
+ *   logic will call this function early in the initialization sequence to
+ *   get the page heap information needed to configure the page allocator.
  *
  ****************************************************************************/
 
-int map_rom_segments(uint32_t app_drom_start, uint32_t app_drom_vaddr,
-                     uint32_t app_drom_size, uint32_t app_irom_start,
-                     uint32_t app_irom_vaddr, uint32_t app_irom_size);
+void up_allocate_pgheap(void **heap_start, size_t *heap_size)
+{
+  DEBUGASSERT(heap_start && heap_size);
 
-#undef EXTERN
-#if defined(__cplusplus)
-}
+#ifndef CONFIG_ARCH_PGPOOL_MAPPING
+  /* pgheap at the end of RAM */
+
+  *heap_start = (void *)(X86_64_PGPOOL_BASE + X86_64_LOAD_OFFSET);
+  *heap_size  = (size_t)X86_64_PGPOOL_SIZE;
+#else
+  /* pgheap defined with Kconfig options */
+
+  *heap_start = (void *)CONFIG_ARCH_PGPOOL_VBASE;
+  *heap_size  = (size_t)CONFIG_ARCH_PGPOOL_SIZE;
 #endif
-
-#endif /* __ASSEMBLY__ */
-#endif /* __ARCH_XTENSA_SRC_ESP32S2_LOADER_H */
+}

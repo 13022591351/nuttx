@@ -1912,6 +1912,7 @@ config ARCH_BOARD_ADAFRUIT_FEATHER_RP2040
 config ARCH_BOARD_SEEED_XIAO_RP2040
 	bool "Seeed Studio XIAO RP2040 board"
 	depends on ARCH_CHIP_RP2040
+	select ARCH_HAVE_LEDS
 	---help---
 		This is a port to the Seeed Studio XIAO RP2040 board.
 		Support is derived from Raspberry Pi Pico support.
@@ -2015,6 +2016,7 @@ config ARCH_BOARD_K230_CANMV
 config ARCH_BOARD_BL808_OX64
 	bool "PINE64 Ox64"
 	depends on ARCH_CHIP_BL808
+	select ARCH_HAVE_LEDS
 	---help---
 		This options selects support for NuttX on PINE64 Ox64 based
 		on Bouffalo Lab BL808 SoC.
