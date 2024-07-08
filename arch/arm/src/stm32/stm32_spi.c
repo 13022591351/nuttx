@@ -99,7 +99,7 @@
 #  if defined(CONFIG_SPI_DMAPRIO)
 #    define SPI_DMA_PRIO  CONFIG_SPI_DMAPRIO
 #  elif defined(CONFIG_STM32_STM32F10XX) || defined(CONFIG_STM32_STM32L15XX) || \
-        defined(CONFIG_STM32_STM32F30XX)
+        defined(CONFIG_STM32_STM32F30XX) || defined(CONFIG_STM32_STM32G4XXX)
 #    define SPI_DMA_PRIO  DMA_CCR_PRIMED
 #  elif defined(CONFIG_STM32_STM32F20XX) || defined(CONFIG_STM32_STM32F4XXX)
 #    define SPI_DMA_PRIO  DMA_SCR_PRIMED
@@ -108,7 +108,7 @@
 #  endif
 
 #  if defined(CONFIG_STM32_STM32F10XX) || defined(CONFIG_STM32_STM32L15XX) || \
-      defined(CONFIG_STM32_STM32F30XX)
+      defined(CONFIG_STM32_STM32F30XX) || defined(CONFIG_STM32_STM32G4XXX)
 #    if (SPI_DMA_PRIO & ~DMA_CCR_PL_MASK) != 0
 #      error "Illegal value for CONFIG_SPI_DMAPRIO"
 #    endif
@@ -123,7 +123,8 @@
 /* DMA channel configuration */
 
 #if defined(CONFIG_STM32_STM32F10XX) || defined(CONFIG_STM32_STM32L15XX) || \
-    defined(CONFIG_STM32_STM32F30XX) || defined(CONFIG_STM32_STM32F37XX)
+    defined(CONFIG_STM32_STM32F30XX) || defined(CONFIG_STM32_STM32F37XX) || \
+    defined(CONFIG_STM32_STM32G4XXX)
 #  define SPI_RXDMA16_CONFIG        (SPI_DMA_PRIO|DMA_CCR_MSIZE_16BITS|DMA_CCR_PSIZE_16BITS|DMA_CCR_MINC            )
 #  define SPI_RXDMA8_CONFIG         (SPI_DMA_PRIO|DMA_CCR_MSIZE_8BITS |DMA_CCR_PSIZE_8BITS |DMA_CCR_MINC            )
 #  define SPI_RXDMA16NULL_CONFIG    (SPI_DMA_PRIO|DMA_CCR_MSIZE_8BITS |DMA_CCR_PSIZE_16BITS                         )
@@ -234,14 +235,16 @@ struct stm32_spidev_s
 
 static inline uint16_t spi_getreg(struct stm32_spidev_s *priv,
                                   uint8_t offset);
-#if defined(CONFIG_STM32_STM32F30XX) || defined(CONFIG_STM32_STM32F37XX)
+#if defined(CONFIG_STM32_STM32F30XX) || defined(CONFIG_STM32_STM32F37XX) || \
+    defined(CONFIG_STM32_STM32G4XXX)
 static inline uint8_t spi_getreg8(struct stm32_spidev_s *priv,
                                   uint8_t offset);
 #endif
 static inline void spi_putreg(struct stm32_spidev_s *priv,
                               uint8_t offset,
                               uint16_t value);
-#if defined(CONFIG_STM32_STM32F30XX) || defined(CONFIG_STM32_STM32F37XX)
+#if defined(CONFIG_STM32_STM32F30XX) || defined(CONFIG_STM32_STM32F37XX) || \
+    defined(CONFIG_STM32_STM32G4XXX)
 static inline void spi_putreg8(struct stm32_spidev_s *priv,
                                uint8_t offset,
                                uint8_t value);
@@ -757,7 +760,8 @@ static inline uint16_t spi_getreg(struct stm32_spidev_s *priv,
  *
  ****************************************************************************/
 
-#if defined(CONFIG_STM32_STM32F30XX) || defined(CONFIG_STM32_STM32F37XX)
+#if defined(CONFIG_STM32_STM32F30XX) || defined(CONFIG_STM32_STM32F37XX) || \
+    defined(CONFIG_STM32_STM32G4XXX)
 static inline uint8_t spi_getreg8(struct stm32_spidev_s *priv,
                                   uint8_t offset)
 {
@@ -804,7 +808,8 @@ static inline void spi_putreg(struct stm32_spidev_s *priv,
  *
  ****************************************************************************/
 
-#if defined(CONFIG_STM32_STM32F30XX) || defined(CONFIG_STM32_STM32F37XX)
+#if defined(CONFIG_STM32_STM32F30XX) || defined(CONFIG_STM32_STM32F37XX) || \
+    defined(CONFIG_STM32_STM32G4XXX)
 static inline void spi_putreg8(struct stm32_spidev_s *priv,
                                uint8_t offset,
                                uint8_t value)
@@ -837,7 +842,8 @@ static inline uint16_t spi_readword(struct stm32_spidev_s *priv)
 
   /* Then return the received byte */
 
-#if defined(CONFIG_STM32_STM32F30XX) || defined(CONFIG_STM32_STM32F37XX)
+#if defined(CONFIG_STM32_STM32F30XX) || defined(CONFIG_STM32_STM32F37XX) || \
+    defined(CONFIG_STM32_STM32G4XXX)
   /* "When the data frame size fits into one byte
    * (less than or equal to 8 bits),
    *  data packing is used automatically when any read or write 16-bit access
@@ -888,7 +894,8 @@ static inline void spi_writeword(struct stm32_spidev_s *priv,
 
   /* Then send the word */
 
-#if defined(CONFIG_STM32_STM32F30XX) || defined(CONFIG_STM32_STM32F37XX)
+#if defined(CONFIG_STM32_STM32F30XX) || defined(CONFIG_STM32_STM32F37XX) || \
+    defined(CONFIG_STM32_STM32G4XXX)
   /* "When the data frame size fits into one byte (less than or equal to 8
    *  bits), data packing is used automatically when any read or write 16-bit
    *  access is performed on the SPIx_DR register. The double data frame
@@ -1232,7 +1239,7 @@ static void spi_modifycr1(struct stm32_spidev_s *priv,
 
 #if defined(CONFIG_STM32_STM32F20XX) || defined(CONFIG_STM32_STM32F30XX) || \
     defined(CONFIG_STM32_STM32F37XX) || defined(CONFIG_STM32_STM32F4XXX) || \
-    defined(CONFIG_STM32_SPI_DMA)
+    defined(CONFIG_STM32_STM32G4XXX) || defined(CONFIG_STM32_SPI_DMA)
 static void spi_modifycr2(struct stm32_spidev_s *priv, uint16_t setbits,
                           uint16_t clrbits)
 {
@@ -1510,7 +1517,8 @@ static void spi_setbits(struct spi_dev_s *dev, int nbits)
 
   if (nbits != priv->nbits)
     {
-#if defined(CONFIG_STM32_STM32F30XX) || defined(CONFIG_STM32_STM32F37XX)
+#if defined(CONFIG_STM32_STM32F30XX) || defined(CONFIG_STM32_STM32F37XX) || \
+    defined(CONFIG_STM32_STM32G4XXX)
       /* Yes... Set CR2 appropriately */
 
       /* Set the number of bits (valid range 4-16) */
@@ -2055,7 +2063,8 @@ static void spi_bus_initialize(struct stm32_spidev_s *priv)
   uint16_t setbits;
   uint16_t clrbits;
 
-#if defined(CONFIG_STM32_STM32F30XX) || defined(CONFIG_STM32_STM32F37XX)
+#if defined(CONFIG_STM32_STM32F30XX) || defined(CONFIG_STM32_STM32F37XX) || \
+    defined(CONFIG_STM32_STM32G4XXX)
   /* Configure CR1 and CR2. Default configuration:
    *   Mode 0:                        CR1.CPHA=0 and CR1.CPOL=0
    *   Master:                        CR1.MSTR=1
@@ -2063,7 +2072,7 @@ static void spi_bus_initialize(struct stm32_spidev_s *priv)
    *   MSB transmitted first:         CR1.LSBFIRST=0
    *   Replace NSS with SSI & SSI=1:  CR1.SSI=1 CR1.SSM=1
    *                                     (prevents MODF error)
-   *   Two lines full duplex:         CR1.BIDIMODE=0 CR1.BIDIOIE=(Don't care)
+   *   Two lines full duplex:         CR1.BIDIMODE=0 CR1.BIDIOE=(Don't care)
    *                                  and CR1.RXONLY=0
    */
 
@@ -2083,7 +2092,7 @@ static void spi_bus_initialize(struct stm32_spidev_s *priv)
    *   8-bit:                         DFF=0
    *   MSB transmitted first:         LSBFIRST=0
    *   Replace NSS with SSI & SSI=1:  SSI=1 SSM=1 (prevents MODF error)
-   *   Two lines full duplex:         BIDIMODE=0 BIDIOIE=(Don't care)
+   *   Two lines full duplex:         BIDIMODE=0 BIDIOE=(Don't care)
    *                                  and RXONLY=0
    */
 
@@ -2175,8 +2184,14 @@ struct spi_dev_s *stm32_spibus_initialize(int bus)
           /* Configure SPI1 pins: SCK, MISO, and MOSI */
 
           stm32_configgpio(GPIO_SPI1_SCK);
+
+#if defined(CONFIG_USE_STM32_SPI1_MISO)
           stm32_configgpio(GPIO_SPI1_MISO);
+#endif
+
+#if defined(CONFIG_USE_STM32_SPI1_MOSI)
           stm32_configgpio(GPIO_SPI1_MOSI);
+#endif
 
           /* Set up default configuration: Master, 8-bit, etc. */
 
@@ -2200,8 +2215,14 @@ struct spi_dev_s *stm32_spibus_initialize(int bus)
           /* Configure SPI2 pins: SCK, MISO, and MOSI */
 
           stm32_configgpio(GPIO_SPI2_SCK);
+
+#if defined(CONFIG_USE_STM32_SPI2_MISO)
           stm32_configgpio(GPIO_SPI2_MISO);
+#endif
+
+#if defined(CONFIG_USE_STM32_SPI2_MOSI)
           stm32_configgpio(GPIO_SPI2_MOSI);
+#endif
 
           /* Set up default configuration: Master, 8-bit, etc. */
 
@@ -2225,8 +2246,14 @@ struct spi_dev_s *stm32_spibus_initialize(int bus)
           /* Configure SPI3 pins: SCK, MISO, and MOSI */
 
           stm32_configgpio(GPIO_SPI3_SCK);
+
+#if defined(CONFIG_USE_STM32_SPI3_MISO)
           stm32_configgpio(GPIO_SPI3_MISO);
+#endif
+
+#if defined(CONFIG_USE_STM32_SPI3_MOSI)
           stm32_configgpio(GPIO_SPI3_MOSI);
+#endif
 
           /* Set up default configuration: Master, 8-bit, etc. */
 
@@ -2250,8 +2277,14 @@ struct spi_dev_s *stm32_spibus_initialize(int bus)
           /* Configure SPI4 pins: SCK, MISO, and MOSI */
 
           stm32_configgpio(GPIO_SPI4_SCK);
+
+#if defined(CONFIG_USE_STM32_SPI4_MISO)
           stm32_configgpio(GPIO_SPI4_MISO);
+#endif
+
+#if defined(CONFIG_USE_STM32_SPI4_MOSI)
           stm32_configgpio(GPIO_SPI4_MOSI);
+#endif
 
           /* Set up default configuration: Master, 8-bit, etc. */
 
@@ -2275,8 +2308,14 @@ struct spi_dev_s *stm32_spibus_initialize(int bus)
           /* Configure SPI5 pins: SCK, MISO, and MOSI */
 
           stm32_configgpio(GPIO_SPI5_SCK);
+
+#if defined(CONFIG_USE_STM32_SPI5_MISO)
           stm32_configgpio(GPIO_SPI5_MISO);
+#endif
+
+#if defined(CONFIG_USE_STM32_SPI5_MOSI)
           stm32_configgpio(GPIO_SPI5_MOSI);
+#endif
 
           /* Set up default configuration: Master, 8-bit, etc. */
 
@@ -2300,8 +2339,14 @@ struct spi_dev_s *stm32_spibus_initialize(int bus)
           /* Configure SPI6 pins: SCK, MISO, and MOSI */
 
           stm32_configgpio(GPIO_SPI6_SCK);
+
+#if defined(CONFIG_USE_STM32_SPI6_MISO)
           stm32_configgpio(GPIO_SPI6_MISO);
+#endif
+
+#if defined(CONFIG_USE_STM32_SPI6_MOSI)
           stm32_configgpio(GPIO_SPI6_MOSI);
+#endif
 
           /* Set up default configuration: Master, 8-bit, etc. */
 

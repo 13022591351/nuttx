@@ -256,9 +256,9 @@
  * Pre-processor Definitions
  ****************************************************************************/
 
-#undef INVALID_CLOCK_SOURCE
+// #undef INVALID_CLOCK_SOURCE
 
-#warning TODO: check I2C clock source. It must be HSI!
+// #warning TODO: check I2C clock source. It must be HSI!
 
 /* CONFIG_I2C_POLLED may be set so that I2C interrupts will not be used.
  * Instead, CPU-intensive polling will be used.
@@ -500,8 +500,19 @@ static int stm32_i2c_pm_prepare(struct pm_callback_s *cb, int domain,
 static const struct stm32_i2c_config_s stm32_i2c1_config =
 {
   .base          = STM32_I2C1_BASE,
+
+#if defined(CONFIG_STM32_STM32G4XXX)
+
+  .clk_bit       = RCC_APB1ENR1_I2C1EN,
+  .reset_bit     = RCC_APB1RSTR1_I2C1RST,
+
+#else
+
   .clk_bit       = RCC_APB1ENR_I2C1EN,
   .reset_bit     = RCC_APB1RSTR_I2C1RST,
+
+#endif
+
   .scl_pin       = GPIO_I2C1_SCL,
   .sda_pin       = GPIO_I2C1_SDA,
 #ifndef CONFIG_I2C_POLLED
@@ -536,8 +547,19 @@ static struct stm32_i2c_priv_s stm32_i2c1_priv =
 static const struct stm32_i2c_config_s stm32_i2c2_config =
 {
   .base          = STM32_I2C2_BASE,
+
+#if defined(CONFIG_STM32_STM32G4XXX)
+
+  .clk_bit       = RCC_APB1ENR1_I2C2EN,
+  .reset_bit     = RCC_APB1RSTR1_I2C2RST,
+
+#elif
+
   .clk_bit       = RCC_APB1ENR_I2C2EN,
   .reset_bit     = RCC_APB1RSTR_I2C2RST,
+
+#endif
+
   .scl_pin       = GPIO_I2C2_SCL,
   .sda_pin       = GPIO_I2C2_SDA,
 #ifndef CONFIG_I2C_POLLED
@@ -572,8 +594,19 @@ static struct stm32_i2c_priv_s stm32_i2c2_priv =
 static const struct stm32_i2c_config_s stm32_i2c3_config =
 {
   .base          = STM32_I2C3_BASE,
+
+#if defined(CONFIG_STM32_STM32G4XXX)
+
+  .clk_bit       = RCC_APB1ENR1_I2C3EN,
+  .reset_bit     = RCC_APB1RSTR1_I2C3RST,
+
+#else
+
   .clk_bit       = RCC_APB1ENR_I2C3EN,
   .reset_bit     = RCC_APB1RSTR_I2C3RST,
+
+#endif
+
   .scl_pin       = GPIO_I2C3_SCL,
   .sda_pin       = GPIO_I2C3_SDA,
 #ifndef CONFIG_I2C_POLLED
@@ -608,8 +641,19 @@ static struct stm32_i2c_priv_s stm32_i2c3_priv =
 static const struct stm32_i2c_config_s stm32_i2c4_config =
 {
   .base          = STM32_I2C4_BASE,
+
+#if defined(CONFIG_STM32_STM32G4XXX)
+
+  .clk_bit       = RCC_APB1ENR2_I2C4EN,
+  .reset_bit     = RCC_APB1RSTR2_I2C4RST,
+
+#else
+
   .clk_bit       = RCC_APB1ENR_I2C4EN,
   .reset_bit     = RCC_APB1RSTR_I2C4RST,
+
+#endif
+
   .scl_pin       = GPIO_I2C4_SCL,
   .sda_pin       = GPIO_I2C4_SDA,
 #ifndef CONFIG_I2C_POLLED
@@ -1206,71 +1250,56 @@ static void stm32_i2c_tracedump(struct stm32_i2c_priv_s *priv)
 static void stm32_i2c_setclock(struct stm32_i2c_priv_s *priv,
                                uint32_t frequency)
 {
-  uint8_t presc;
-  uint8_t scl_delay;
-  uint8_t sda_delay;
-  uint8_t scl_h_period;
-  uint8_t scl_l_period;
-
+  UNUSED(frequency);
   /* I2C peripheral must be disabled to update clocking configuration.
    * This will SW reset the device.
    */
 
   stm32_i2c_modifyreg32(priv, STM32_I2C_CR1_OFFSET, I2C_CR1_PE, 0);
 
-  if (frequency != priv->frequency)
+#if defined(CONFIG_STM32_I2C1)
+
+  if (priv->config->base == STM32_I2C1_BASE)
     {
-      /*  The Speed and timing calculation are based on the following
-       *  fI2CCLK = HSI and is 16Mhz
-       *  Analog filter is on,
-       *  Digital filter off
-       *  Rise Time is 120 ns and fall is 10ns
-       *  Mode is FastMode
-       */
-
-      if (frequency == 100000)
-        {
-          presc        = 0;
-          scl_delay    = 5;
-          sda_delay    = 0;
-          scl_h_period = 61;
-          scl_l_period = 89;
-        }
-      else if (frequency == 400000)
-        {
-          presc        = 0;
-          scl_delay    = 3;
-          sda_delay    = 0;
-          scl_h_period = 6;
-          scl_l_period = 24;
-        }
-      else if (frequency == 1000000)
-        {
-          presc        = 0;
-          scl_delay    = 2;
-          sda_delay    = 0;
-          scl_h_period = 1;
-          scl_l_period = 5;
-        }
-      else
-        {
-          presc        = 7;
-          scl_delay    = 0;
-          sda_delay    = 0;
-          scl_h_period = 35;
-          scl_l_period = 162;
-        }
-
-      uint32_t timingr =
-        (presc << I2C_TIMINGR_PRESC_SHIFT) |
-        (scl_delay << I2C_TIMINGR_SCLDEL_SHIFT) |
-        (sda_delay << I2C_TIMINGR_SDADEL_SHIFT) |
-        (scl_h_period << I2C_TIMINGR_SCLH_SHIFT) |
-        (scl_l_period << I2C_TIMINGR_SCLL_SHIFT);
-
-      stm32_i2c_putreg32(priv, STM32_I2C_TIMINGR_OFFSET, timingr);
-      priv->frequency = frequency;
+      priv->frequency = CONFIG_STM32_I2C1_FREQ;
+      stm32_i2c_putreg32(priv, STM32_I2C_TIMINGR_OFFSET,
+        CONFIG_STM32_I2C1_TIMING);
     }
+
+#endif
+
+#if defined(CONFIG_STM32_I2C2)
+
+  if (priv->config->base == STM32_I2C2_BASE)
+    {
+      priv->frequency = CONFIG_STM32_I2C2_FREQ;
+      stm32_i2c_putreg32(priv, STM32_I2C_TIMINGR_OFFSET,
+        CONFIG_STM32_I2C2_TIMING);
+    }
+
+#endif
+
+#if defined(CONFIG_STM32_I2C3)
+
+  if (priv->config->base == STM32_I2C3_BASE)
+    {
+      priv->frequency = CONFIG_STM32_I2C3_FREQ;
+      stm32_i2c_putreg32(priv, STM32_I2C_TIMINGR_OFFSET,
+        CONFIG_STM32_I2C3_TIMING);
+    }
+
+#endif
+
+#if defined(CONFIG_STM32_I2C4)
+
+  if (priv->config->base == STM32_I2C4_BASE)
+    {
+      priv->frequency = CONFIG_STM32_I2C4_FREQ;
+      stm32_i2c_putreg32(priv, STM32_I2C_TIMINGR_OFFSET,
+        CONFIG_STM32_I2C4_TIMING);
+    }
+
+#endif
 
   /* Enable I2C peripheral */
 
@@ -2148,8 +2177,26 @@ static int stm32_i2c_init(struct stm32_i2c_priv_s *priv)
   /* Enable power and reset the peripheral */
 
   modifyreg32(STM32_RCC_APB1ENR, 0, priv->config->clk_bit);
+
+#if defined(CONFIG_STM32_STM32G4XXX)
+
+  if (priv->config->base == STM32_I2C4_BASE)
+    {
+      modifyreg32(STM32_RCC_APB1RSTR2, 0, priv->config->reset_bit);
+      modifyreg32(STM32_RCC_APB1RSTR2, priv->config->reset_bit, 0);
+    }
+  else
+    {
+      modifyreg32(STM32_RCC_APB1RSTR1, 0, priv->config->reset_bit);
+      modifyreg32(STM32_RCC_APB1RSTR1, priv->config->reset_bit, 0);
+    }
+
+#elif
+
   modifyreg32(STM32_RCC_APB1RSTR, 0, priv->config->reset_bit);
   modifyreg32(STM32_RCC_APB1RSTR, priv->config->reset_bit, 0);
+
+#endif
 
   /* Configure pins */
 
@@ -2713,10 +2760,10 @@ struct i2c_master_s *stm32_i2cbus_initialize(int port)
   struct stm32_i2c_priv_s *priv = NULL;  /* private data of device with multiple instances */
   struct stm32_i2c_inst_s *inst = NULL;  /* device, single instance */
 
-#if STM32_HSI_FREQUENCY != 8000000 || defined(INVALID_CLOCK_SOURCE)
-#  warning STM32_I2C_INIT: Peripheral clock is HSI and it must be 16mHz or the speed/timing calculations need to be redone.
-  return NULL;
-#endif
+// #if STM32_HSI_FREQUENCY != 8000000 || defined(INVALID_CLOCK_SOURCE)
+// #  warning STM32_I2C_INIT: Peripheral clock is HSI and it must be 16mHz or the speed/timing calculations need to be redone.
+//   return NULL;
+// #endif
 
   /* Get I2C private structure */
 

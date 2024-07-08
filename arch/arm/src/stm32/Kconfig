@@ -3002,22 +3002,76 @@ config STM32_HRTIM_TIME
 
 endif # STM32_HRTIM
 
-config STM32_I2C1
+menuconfig STM32_I2C1
 	bool "I2C1"
 	default n
 	select STM32_I2C
 
-config STM32_I2C2
+if STM32_I2C1
+
+config STM32_I2C1_FREQ
+	int "Stm32 I2C1 Frequency"
+	default 100000
+
+config STM32_I2C1_TIMING
+	hex "Stm32 I2C1 Timing"
+	default 0x0
+
+endif # STM32_I2C1
+
+menuconfig STM32_I2C2
 	bool "I2C2"
 	default n
 	depends on STM32_HAVE_I2C2
 	select STM32_I2C
 
-config STM32_I2C3
+if STM32_I2C2
+
+config STM32_I2C2_FREQ
+	int "Stm32 I2C2 Frequency"
+	default 100000
+
+config STM32_I2C2_TIMING
+	hex "Stm32 I2C2 Timing"
+	default 0x0
+
+endif # STM32_I2C2
+
+menuconfig STM32_I2C3
 	bool "I2C3"
 	default n
 	depends on STM32_HAVE_I2C3
 	select STM32_I2C
+
+if STM32_I2C3
+
+config STM32_I2C3_FREQ
+	int "Stm32 I2C3 Frequency"
+	default 100000
+
+config STM32_I2C3_TIMING
+	hex "Stm32 I2C3 Timing"
+	default 0x0
+
+endif # STM32_I2C3
+
+menuconfig STM32_I2C4
+	bool "I2C4"
+	default n
+	depends on STM32_HAVE_I2C4
+	select STM32_I2C
+
+if STM32_I2C4
+
+config STM32_I2C4_FREQ
+	int "Stm32 I2C4 Frequency"
+	default 100000
+
+config STM32_I2C4_TIMING
+	hex "Stm32 I2C4 Timing"
+	default 0x0
+
+endif # STM32_I2C4
 
 config STM32_LPTIM1
 	bool "LPTIM1"
@@ -3116,25 +3170,61 @@ config STM32_SDIO
 	select ARCH_HAVE_SDIOWAIT_WRCOMPLETE
 	select ARCH_HAVE_SDIO_PREFLIGHT
 
-config STM32_SPI1
+menuconfig STM32_SPI1
 	bool "SPI1"
 	default n
 	select SPI
 	select STM32_SPI
 
-config STM32_SPI2
+if STM32_SPI1
+
+config USE_STM32_SPI1_MISO
+	bool "USE_SPI1_MISO"
+	default y
+
+config USE_STM32_SPI1_MOSI
+	bool "USE_SPI1_MOSI"
+	default y
+
+endif # STM32_SPI1
+
+menuconfig STM32_SPI2
 	bool "SPI2"
 	default n
 	depends on STM32_HAVE_SPI2
 	select SPI
 	select STM32_SPI
 
-config STM32_SPI3
+if STM32_SPI2
+
+config USE_STM32_SPI2_MISO
+	bool "USE_SPI2_MISO"
+	default y
+
+config USE_STM32_SPI2_MOSI
+	bool "USE_SPI2_MOSI"
+	default y
+
+endif # STM32_SPI2
+
+menuconfig STM32_SPI3
 	bool "SPI3"
 	default n
 	depends on STM32_HAVE_SPI3
 	select SPI
 	select STM32_SPI
+
+if STM32_SPI3
+
+config USE_STM32_SPI3_MISO
+	bool "USE_SPI3_MISO"
+	default y
+
+config USE_STM32_SPI3_MOSI
+	bool "USE_SPI3_MOSI"
+	default y
+
+endif # STM32_SPI3
 
 config STM32_I2S3
 	bool "I2S3"
@@ -3143,26 +3233,62 @@ config STM32_I2S3
 	select I2S
 	select STM32_I2S
 
-config STM32_SPI4
+menuconfig STM32_SPI4
 	bool "SPI4"
 	default n
 	depends on STM32_HAVE_SPI4
 	select SPI
 	select STM32_SPI
 
-config STM32_SPI5
+if STM32_SPI4
+
+config USE_STM32_SPI4_MISO
+	bool "USE_SPI4_MISO"
+	default y
+
+config USE_STM32_SPI4_MOSI
+	bool "USE_SPI4_MOSI"
+	default y
+
+endif # STM32_SPI4
+
+menuconfig STM32_SPI5
 	bool "SPI5"
 	default n
 	depends on STM32_HAVE_SPI5
 	select SPI
 	select STM32_SPI
 
-config STM32_SPI6
+if STM32_SPI5
+
+config USE_STM32_SPI5_MISO
+	bool "USE_SPI5_MISO"
+	default y
+
+config USE_STM32_SPI5_MOSI
+	bool "USE_SPI5_MOSI"
+	default y
+
+endif # STM32_SPI5
+
+menuconfig STM32_SPI6
 	bool "SPI6"
 	default n
 	depends on STM32_HAVE_SPI6
 	select SPI
 	select STM32_SPI
+
+if STM32_SPI6
+
+config USE_STM32_SPI6_MISO
+	bool "USE_SPI6_MISO"
+	default y
+
+config USE_STM32_SPI6_MOSI
+	bool "USE_SPI6_MOSI"
+	default y
+
+endif # STM32_SPI6
 
 config STM32_SYSCFG
 	bool "SYSCFG"

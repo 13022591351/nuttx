@@ -1,5 +1,5 @@
 ############################################################################
-# boards/arm/stm32/stm32f4discovery/src/Make.defs
+# boards/arm/stm32/b-g431b-esc1/src/Make.defs
 #
 # Licensed to the Apache Software Foundation (ASF) under one or more
 # contributor license agreements.  See the NOTICE file distributed with
@@ -20,74 +20,32 @@
 
 include $(TOPDIR)/Make.defs
 
+ASRCS =
 CSRCS = stm32_boot.c stm32_bringup.c stm32_spi.c
 
-ifeq ($(CONFIG_USERLED),y)
-CSRCS += stm32_userleds.c userled_lower.c
-endif
-
-ifeq ($(CONFIG_STM32_CAN_CHARDRIVER),y)
-CSRCS += stm32_can.c
-endif
-
-ifeq ($(CONFIG_STM32_OTGFS),y)
-CSRCS += stm32_usb.c
-endif
-
-ifeq ($(CONFIG_STM32_SDIO),y)
-CSRCS += stm32_sdio.c
-endif
-
-ifeq ($(CONFIG_PWM),y)
-CSRCS += stm32_pwm.c
-endif
-
-ifeq ($(CONFIG_CAPTURE),y)
-CSRCS += stm32_capture.c
+ifeq ($(CONFIG_I2C),y)
+CSRCS += stm32_i2c.c
 endif
 
 ifeq ($(CONFIG_BOARDCTL),y)
 CSRCS += stm32_appinit.c
-ifeq ($(CONFIG_BOARDCTL_RESET),y)
-CSRCS += stm32_reset.c
-endif
 endif
 
-ifeq ($(CONFIG_ARCH_IDLE_CUSTOM),y)
-CSRCS += stm32_idle.c
+ifeq ($(CONFIG_STM32_FDCAN),y)
+ifeq ($(CONFIG_STM32_FDCAN_CHARDRIVER),y)
+CSRCS += stm32_can.c
 endif
-
-ifeq ($(CONFIG_TIMER),y)
-CSRCS += stm32_timer.c
+ifeq ($(CONFIG_STM32_FDCAN_SOCKET),y)
+CSRCS += stm32_cansock.c
+endif
 endif
 
 ifeq ($(CONFIG_BOARDCTL_UNIQUEID),y)
 CSRCS += stm32_uid.c
 endif
 
-ifeq ($(CONFIG_USBMSC),y)
-CSRCS += stm32_usbmsc.c
-endif
-
-ifeq ($(CONFIG_USBDEV_COMPOSITE),y)
-  CSRCS += stm32_composite.c
-endif
-
-ifeq ($(CONFIG_FAT_DMAMEMORY),y)
-CSRCS += stm32_dma_alloc.c
-endif
-
 ifeq ($(CONFIG_ETC_ROMFS),y)
-  RCSRCS = etc/init.d/rc.sysinit etc/init.d/rcS etc/init.d/rc.user
-  ifeq ($(CONFIG_DYW_NTRIP_CLIENT),y)
-    RCSRCS += etc/ini/ntrip.ini
-  endif
-  ifeq ($(CONFIG_DYW_RTCM3_PROXY),y)
-    RCSRCS += etc/ini/rtcm3_proxy.ini
-  endif
-  ifeq ($(CONFIG_DYW_UNICORE),y)
-    RCSRCS += etc/ini/unicore.ini
-  endif
+RCSRCS = etc/init.d/rc.sysinit etc/init.d/rcS
 endif
 
 DEPPATH += --dep-path board

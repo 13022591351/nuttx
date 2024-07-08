@@ -2,21 +2,20 @@ sleep 2
 
 ifconfig eth0 192.168.0.100
 
-echo -c "MODE BASE TIME 10" > dev/ttyS2
+if [ -e "/mnt/sd0/etc/ini/unicore.ini" ]; then
+unicore /mnt/sd0/etc/ini/unicore.ini &
+else
+unicore /etc/ini/unicore.ini &
+fi
 
-unicore &
+if [ -e "/mnt/sd0/etc/ini/rtcm3_proxy.ini" ]; then
+rtcm3_proxy /mnt/sd0/etc/ini/rtcm3_proxy.ini &
+else
+rtcm3_proxy /etc/ini/rtcm3_proxy.ini &
+fi
 
-rtcm3_proxy &
-
-ntrip_client "sdk.pnt.10086.cn" "8002" "RTCM33_GRC" "NTRIP GNSSInternetRadio/1.4.10" "csha20325" "ac848wme" &
-
-exit 0
-
-echo -c "UNLOG COM2" > dev/ttyS2
-echo -c "RTCM1005 COM2 10" > dev/ttyS2
-echo -c "RTCM1033 COM2 10" > dev/ttyS2
-echo -c "RTCM1125 COM2 1" > dev/ttyS2
-echo -c "RTCM1075 COM2 1" > dev/ttyS2
-echo -c "RTCM1085 COM2 1" > dev/ttyS2
-
-exit 0
+if [ -e "/mnt/sd0/etc/ini/ntrip.ini" ]; then
+ntrip_client /mnt/sd0/etc/ini/ntrip.ini &
+else
+ntrip_client /etc/ini/ntrip.ini &
+fi

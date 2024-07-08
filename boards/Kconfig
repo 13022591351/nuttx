@@ -18,6 +18,12 @@ config ARCH_BOARD_FMU_V1
 	---help---
 		STMicro FMU-V1 board based on the STMicro STM32F407IGT6 MCU.
 
+config ARCH_BOARD_PPJET_TCU
+	bool "STMicro PPJET-TCU board"
+	depends on ARCH_CHIP_STM32G431C
+	---help---
+		STMicro PPJET-TCU board based on the STMicro STM32G431CBU6 MCU.
+
 config ARCH_BOARD_AMBER
 	bool "Amber Web Server"
 	depends on ARCH_CHIP_ATMEGA128
@@ -3170,6 +3176,7 @@ endif #ARCH_BOARD_CUSTOM
 config ARCH_BOARD
 	string
 	default "fmu_v1"                    if ARCH_BOARD_FMU_V1
+	default "ppjet_tcu"                 if ARCH_BOARD_PPJET_TCU
 	default "amber"                     if ARCH_BOARD_AMBER
 	default "arduino-mega2560"          if ARCH_BOARD_ARDUINO_MEGA2560
 	default "arduino-due"               if ARCH_BOARD_ARDUINO_DUE
@@ -3539,6 +3546,9 @@ comment "Board-Specific Options"
 
 if ARCH_BOARD_FMU_V1
 source "boards/arm/stm32/fmu_v1/Kconfig"
+endif
+if ARCH_BOARD_PPJET_TCU
+source "boards/arm/stm32/ppjet_tcu/Kconfig"
 endif
 if ARCH_BOARD_PCDUINO_A10
 source "boards/arm/a1x/pcduino-a10/Kconfig"

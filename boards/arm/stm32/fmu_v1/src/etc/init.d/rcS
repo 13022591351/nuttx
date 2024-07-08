@@ -5,5 +5,3 @@ sh /mnt/sd0/etc/init.d/rc.user &
 else
 sh /etc/init.d/rc.user &
 fi
-
-exit 0
