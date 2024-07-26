@@ -501,6 +501,7 @@ rndis
 Configures the NuttShell (nsh), enables a serial console on USART6 and enables RNDIS over USB.
 NSH commands::
 
+       nsh> mount -t procfs /proc
        nsh> ping -h
 
        Usage: ping [-c <count>] [-i <interval>] [-W <timeout>] [-s <size>] <hostname>
@@ -598,3 +599,68 @@ The board profile configures the NSH over USB and you can use the fb command to 
          5: ( 55, 25) ( 18, 14)
         Test finished
         nsh>
+
+telnetd
+-------
+
+Configures the NuttShell (nsh), enables a serial console on USART6, enables RNDIS over USB and
+enables Device Configuration over Telnet.  
+NSH commands::
+
+       nsh> mount -t procfs /proc
+       nsh> ifcong
+
+Get the ip address assigned to eth0 and convert to hexadecimal, for example 192.168.1.2
+becomes 0xC0A80102, than configure CONFIG_NETINIT_IPADDR and CONFIG_EXAMPLES_TELNETD_IPADDR,
+also configure the router address, in this example it woukd be 0xC0A80101. After theses changes
+rebuild and load the new firmware on your board::
+
+       nsh> mount -t procfs /proc
+       nsh> telnetd
+
+At your host PC, telnet to IP address for the board::
+
+       $ telnet 192.168.01.02
+
+Now you will be able to access the Device Configuration over Telnet::
+
+       Device Configuration over Telnet
+       You can add functions to setup your device
+       Type '?' and press <enter> for help
+       cfg> ?
+       Available commands:
+       help, ?   - show help
+       reset     - reset the board
+       exit      - exit shell
+
+max7219
+-------
+
+Configures the NuttShell (nsh) over USB Serial (check usbserial configuration) and enables LCD driver with
+MAX7219 for 8x8 LED matrix::
+
+       NuttShell (NSH) NuttX-12.5.1                                      
+       nsh> 
+       nsh> nxhello
+       nxhello_main: NX handle=0x20005420
+       nxhello_main: Set background color=0
+       nxhello_listener: Connected
+       nxhello_main: Screen resolution (32,8)
+       nxhello_hello: Position (3,0)
+       nxhello_main: Disconnect from the server
+       nsh>
+
+
+======= ====
+MAX7219 PINS
+======= ====
+CS      PC4
+DIN     PA7
+Clk     PA5
+======= ====
+
+As this LED matrix can be combined either horizontally or vetically,
+you can configure this using menuconfig::
+
+       Number of 8x8 LEDs matrices in the horizontal (width)
+       Number of 8x8 LEDs matrices in the vertical (height)

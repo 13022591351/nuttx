@@ -51,8 +51,8 @@ GPIO         Yes
 I2C          No
 I2S          No
 PWM          No
-SPI          No
-Timers       No
+SPI          Yes
+Timers       Yes
 UART         Yes
 USB          No
 =========== ======= ====================

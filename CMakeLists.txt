@@ -173,6 +173,7 @@ if(NOT EXISTS "${NUTTX_APPS_DIR}")
   message(FATAL_ERROR "Application directory ${NUTTX_APPS_DIR} is not found")
 endif()
 
+get_filename_component(NUTTX_APPS_DIR ${NUTTX_APPS_DIR} ABSOLUTE)
 get_filename_component(apps_dir ${NUTTX_APPS_DIR} NAME)
 set(NUTTX_APPS_BINDIR "${CMAKE_BINARY_DIR}/${apps_dir}")
 
@@ -513,6 +514,20 @@ if(CONFIG_NDEBUG)
   add_compile_options(-DNDEBUG)
 endif()
 
+# Cmake build provide absolute paths to compile files. If __FILE__ macros are
+# used in the source code(ASSERT), the binary will contain many invalid paths.
+# This saves some memory, stops exposing build systems locations in binaries,
+# make failure logs more deterministic and most importantly makes builds more
+# failure logs more deterministic and most importantly makes builds more
+# deterministic. Debuggers usually have a path mapping feature to ensure the
+# files are still found.
+if(CONFIG_OUTPUT_STRIP_PATHS)
+  add_compile_options(-fmacro-prefix-map=${NUTTX_DIR}=)
+  add_compile_options(-fmacro-prefix-map=${NUTTX_APPS_DIR}=)
+  add_compile_options(-fmacro-prefix-map=${NUTTX_BOARD_ABS_DIR}=)
+  add_compile_options(-fmacro-prefix-map=${NUTTX_CHIP_ABS_DIR}=)
+endif()
+
 add_definitions(-D__NuttX__)
 
 set_property(
@@ -622,7 +637,7 @@ if(NOT CONFIG_ARCH_SIM)
 
   # TODO: nostart/nodefault not applicable to nuttx toolchain
   target_link_libraries(
-    nuttx PRIVATE -Wl,--script=${ldscript} -Wl,--start-group ${nuttx_libs}
+    nuttx PRIVATE -T${ldscript} -Wl,--start-group ${nuttx_libs}
                   ${nuttx_extra_libs} -Wl,--end-group)
 
   # generate binary outputs in different formats (.bin, .hex, etc)
@@ -755,7 +770,7 @@ if(CONFIG_BUILD_PROTECTED)
   get_property(nuttx_apps_libs GLOBAL PROPERTY NUTTX_APPS_LIBRARIES)
 
   get_property(user_ldscript GLOBAL PROPERTY LD_SCRIPT_USER)
-  list(TRANSFORM user_ldscript PREPEND "-Wl,--script=")
+  list(TRANSFORM user_ldscript PREPEND "-T")
 
   execute_process(
     COMMAND ${CMAKE_C_COMPILER} ${CMAKE_C_FLAGS} ${NUTTX_EXTRA_FLAGS}
