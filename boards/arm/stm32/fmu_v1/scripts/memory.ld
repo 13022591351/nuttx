@@ -73,7 +73,7 @@ MEMORY
 {
   /* 1024Kb FLASH */
 
-  kflash (rx)      : ORIGIN = 0x08000000, LENGTH = 256K
+  kflash (rx)      : ORIGIN = 0x08004000, LENGTH = 240K
   uflash (rx)      : ORIGIN = 0x08040000, LENGTH = 256K
   xflash (rx)      : ORIGIN = 0x08080000, LENGTH = 512K
 

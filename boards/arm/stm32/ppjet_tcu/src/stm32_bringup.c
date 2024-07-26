@@ -115,6 +115,28 @@ int stm32_bringup(void)
 
 #endif
 
+#ifdef CONFIG_PWM
+  /* Initialize PWM and register the PWM driver. */
+
+  ret = stm32_pwm_setup();
+  if (ret < 0)
+    {
+      syslog(LOG_ERR, "ERROR: stm32_pwm_setup failed: %d\n", ret);
+    }
+
+#endif
+
+#ifdef CONFIG_ADC
+  /* Initialize ADC and register the ADC driver. */
+
+  ret = stm32_adc_setup();
+  if (ret < 0)
+    {
+      syslog(LOG_ERR, "ERROR: stm32_adc_setup failed: %d\n", ret);
+    }
+
+#endif
+
 #ifdef CONFIG_STM32_FDCAN_CHARDRIVER
   /* Initialize CAN and register the CAN driver. */
 

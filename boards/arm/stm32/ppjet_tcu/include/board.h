@@ -192,9 +192,38 @@
 #define GPIO_I2C2_SCL   (GPIO_I2C2_SCL_1  | GPIO_SPEED_50MHz)   /* PA09 */
 #define GPIO_I2C2_SDA   (GPIO_I2C2_SDA_1  | GPIO_SPEED_50MHz)   /* PA08 */
 
-/* DMA channels *************************************************************/
+/* TIM3 */
 
-/* ADC */
+#define GPIO_TIM3_CH1OUT   (GPIO_TIM3_CH1OUT_1 | GPIO_SPEED_50MHz)  /* PA06 */
 
-#define ADC1_DMA_CHAN DMAMAP_DMA12_ADC1_0     /* DMA1 */
+#define STM32_TIM3_TRGO     ATIM_CR2_MMS_OC2REF
 
+/* TIM4 */
+
+#define GPIO_TIM4_CH1OUT   (GPIO_TIM4_CH1OUT_2 | GPIO_SPEED_50MHz)  /* PB06 */
+#define GPIO_TIM4_CH2OUT   (GPIO_TIM4_CH2OUT_2 | GPIO_SPEED_50MHz)  /* PB07 */
+
+/* TIM8 */
+
+#define GPIO_TIM8_CH1OUT   (GPIO_TIM8_CH1OUT_3 | GPIO_SPEED_50MHz)  /* PC06 */
+
+#define STM32_TIM8_TRGO     ATIM_CR2_MMS_OC2REF
+
+/* ADC1 */
+
+#define GPIO_ADC1_IN12      GPIO_ADC1_IN12_0    /* PB01 */
+#define GPIO_ADC1_IN14      GPIO_ADC1_IN14_0    /* PB11 */
+#define GPIO_ADC1_IN15      GPIO_ADC1_IN15_0    /* PB00 */
+
+/* ADC1 DMA */
+
+#define ADC1_DMA_CHAN       DMAMAP_DMA12_ADC1_0
+
+/* ADC2 */
+
+#define GPIO_ADC2_IN14      GPIO_ADC2_IN14_0    /* PB11 */
+#define GPIO_ADC2_IN17      GPIO_ADC2_IN17_0    /* PA04 */
+
+/* ADC2 DMA */
+
+#define ADC1_DMA_CHAN       DMAMAP_DMA12_ADC2_0
